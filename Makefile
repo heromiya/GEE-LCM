@@ -1,9 +1,9 @@
 gt_$(GID).tif:
-	EXTENT=`ogrinfo -where "GID='$(GID)'" $(OUTDB) gt -al -summary | grep Extent` && \
-	XMIN=`echo $$EXTENT | sed 's/Extent: (\([-.0-9].*\), \([-.0-9].*\)) - (\([-.0-9].*\), \([-.0-9].*\))/\1/g'` && \
-	YMIN=`echo $$EXTENT | sed 's/Extent: (\([-.0-9].*\), \([-.0-9].*\)) - (\([-.0-9].*\), \([-.0-9].*\))/\2/g'` && \
-	XMAX=`echo $$EXTENT | sed 's/Extent: (\([-.0-9].*\), \([-.0-9].*\)) - (\([-.0-9].*\), \([-.0-9].*\))/\3/g'` && \
-	YMAX=`echo $$EXTENT | sed 's/Extent: (\([-.0-9].*\), \([-.0-9].*\)) - (\([-.0-9].*\), \([-.0-9].*\))/\4/g'` && \
+	EXTENT=`spatialite -silent $(OUTDB) "SELECT ST_MinX(ST_Collect(geometry)),ST_MinY(ST_Collect(geometry)),ST_MaxX(ST_Collect(geometry)),ST_MaxY(ST_Collect(geometry)) from gt where GID='$(GID)'"` && \
+	XMIN=`echo $$EXTENT | cut -d '|' -f 1` && \
+	YMIN=`echo $$EXTENT | cut -d '|' -f 2`  && \
+	XMAX=`echo $$EXTENT | cut -d '|' -f 3`  && \
+	YMAX=`echo $$EXTENT | cut -d '|' -f 4`  && \
 	gdal_rasterize -te $$XMIN $$YMIN $$XMAX $$YMAX -a mc_id -l gt -where "GID='$(GID)'" -of GTiff -co COMPRESS=Deflate -a_nodata 255 -tr 0.00025 0.00025 -ot Byte $(OUTDB) $@
 gt_$(GID).tmp: gt_$(GID).tif
 	gdal_translate -of XYZ $< $@
