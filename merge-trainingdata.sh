@@ -26,6 +26,7 @@ spatialite -silent $OUTDB "INSERT INTO gt (geometry,mc_id,gid) SELECT ST_Transfo
 
 #:<<'#EOF'
 
+mkdir pointize
 cd pointize
 for GID in `spatialite $OUTDB "SELECT gid from gt group by gid;"`; do 
 	export GID
