@@ -36,6 +36,6 @@ cd ..
 
 rm -f gt-pt.*
 for LAYER in `ogrinfo pointize | grep Point | awk '{print $2}'`; do
-	ogr2ogr -append -sql "SELECT '`echo $LAYER | sed 's/gt_//g'`' as gid, cast(mc_id as integer) as class, cast(`echo $LAYER | sed 's/gt_L[CET][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/'` as integer) AS year from $LAYER" gt-pt.shp pointize $LAYER
+	ogr2ogr -append -sql "SELECT '`echo $LAYER | sed 's/gt_//g'`' as gid, cast(mc_id as integer) as class, cast(`echo $LAYER | sed 's/gt_L[CET][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;'` as integer) AS year from $LAYER" gt-pt.shp pointize $LAYER
 done
 #EOF
