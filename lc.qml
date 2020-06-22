@@ -1,19 +1,37 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis version="2.18.12" minimumScale="inf" maximumScale="1e+08" hasScaleBasedVisibilityFlag="0">
+<qgis styleCategories="AllStyleCategories" minScale="1e+08" version="3.8.2-Zanzibar" maxScale="0" hasScaleBasedVisibilityFlag="0">
+  <flags>
+    <Identifiable>1</Identifiable>
+    <Removable>1</Removable>
+    <Searchable>1</Searchable>
+  </flags>
+  <customproperties>
+    <property key="WMSBackgroundLayer" value="false"/>
+    <property key="WMSPublishDataSourceUrl" value="false"/>
+    <property key="embeddedWidgets/count" value="0"/>
+    <property key="identify/format" value="Value"/>
+  </customproperties>
   <pipe>
-    <rasterrenderer opacity="1" alphaBand="0" classificationMax="4" classificationMinMaxOrigin="CumulativeCutFullExtentEstimated" band="1" classificationMin="1" type="singlebandpseudocolor">
+    <rasterrenderer type="paletted" opacity="1" band="1" alphaBand="-1">
       <rasterTransparency/>
-      <rastershader>
-        <colorrampshader colorRampType="INTERPOLATED" clip="0">
-          <item alpha="255" value="1" label="1" color="#1f78b4"/>
-          <item alpha="255" value="2" label="2" color="#33a02c"/>
-          <item alpha="255" value="3" label="3" color="#ff7f00"/>
-          <item alpha="255" value="4" label="4" color="#e31a1c"/>
-        </colorrampshader>
-      </rastershader>
+      <minMaxOrigin>
+        <limits>None</limits>
+        <extent>WholeRaster</extent>
+        <statAccuracy>Estimated</statAccuracy>
+        <cumulativeCutLower>0.02</cumulativeCutLower>
+        <cumulativeCutUpper>0.98</cumulativeCutUpper>
+        <stdDevFactor>2</stdDevFactor>
+      </minMaxOrigin>
+      <colorPalette>
+        <paletteEntry value="1" color="#1f78b4" alpha="255" label="1"/>
+        <paletteEntry value="2" color="#33a02c" alpha="255" label="2"/>
+        <paletteEntry value="3" color="#fdbf6f" alpha="255" label="3"/>
+        <paletteEntry value="4" color="#dc0f0f" alpha="255" label="4"/>
+      </colorPalette>
+      <colorramp name="[source]" type="randomcolors"/>
     </rasterrenderer>
-    <brightnesscontrast brightness="0" contrast="0"/>
-    <huesaturation colorizeGreen="128" colorizeOn="0" colorizeRed="255" colorizeBlue="128" grayscaleMode="0" saturation="0" colorizeStrength="100"/>
+    <brightnesscontrast contrast="0" brightness="0"/>
+    <huesaturation colorizeGreen="128" saturation="0" colorizeStrength="100" colorizeOn="0" grayscaleMode="0" colorizeBlue="128" colorizeRed="255"/>
     <rasterresampler maxOversampling="2"/>
   </pipe>
   <blendMode>0</blendMode>
