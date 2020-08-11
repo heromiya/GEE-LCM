@@ -9,7 +9,7 @@ gt_$(GID).tmp: gt_$(GID).tif
 	gdal_translate -of XYZ $< $@
 gt_$(GID).csv: gt_$(GID).tmp
 	echo "x,y,mc_id" > $@
-	for MC_ID in 1 2 3 4; do awk -v mc_id=$$MC_ID '$$3 == mc_id {print rand(),$$0}' $< | sort -k 1 | head -n 1024 | awk 'BEGIN{OFS=","}{print $$2,$$3,$$4}' >> $@; done
+	for MC_ID in 1 2 3 4; do awk -v mc_id=$$MC_ID '$$3 == mc_id {print rand(),$$0}' $< | sort -k 1 | head -n $(NSAMPLE) | awk 'BEGIN{OFS=","}{print $$2,$$3,$$4}' >> $@; done
 gt_$(GID).vrt:
 	echo "<OGRVRTDataSource><OGRVRTLayer name='gt_$(GID)'><SrcDataSource>gt_$(GID).csv</SrcDataSource><GeometryType>wkbPoint</GeometryType><LayerSRS>WGS84</LayerSRS><GeometryField encoding='PointFromColumns' x='x' y='y'/></OGRVRTLayer></OGRVRTDataSource>" > $@
 gt_$(GID).shp: gt_$(GID).vrt gt_$(GID).csv
