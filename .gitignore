@@ -1,2 +1,10 @@
 
 tmp.sql
+gt-pt.dbf
+gt-pt.prj
+gt-pt.shp
+gt-pt.shx
+*.tif
+*.xml
+*.gpkg
+pointize/*
