@@ -34,8 +34,7 @@ spatialite -silent $OUTDB ".loadshp 'past/Danworks' danworks UTF-8 32648 geometr
 spatialite -silent $OUTDB "INSERT INTO gt (geometry,mc_id,gid) SELECT ST_Transform(geometry,4326), mc_id, gid from danworks; SELECT CreateSpatialIndex('gt','geometry');"
 
 
-#mkdir -p pointize
-#cd pointize
+mkdir -p pointize
 for GID in `spatialite $OUTDB "SELECT gid from gt group by gid;" | sed 's/\r//g'`; do
 #f_pointize() {
 #    export GID=$1
