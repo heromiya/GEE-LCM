@@ -2,7 +2,7 @@
 
 export NSAMPLE=1000 # Number of sample per class in a scene.
 
-# For Windows with OSGeo4W64 and Git Bash
+# For Windows with OSGeo4W64 and Git Bash. Requiring "gdal-full" in OSGeo4W.
 if [ $OS = 'Windows_NT' ]; then 
     export PYTHONPATH=/c/OSGeo4W64/apps/Python37/Lib
     export PATH=$PATH:/c/OSGeo4W64/bin
