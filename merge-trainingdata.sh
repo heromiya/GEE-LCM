@@ -21,7 +21,7 @@ rm -f $OUTDB
 SQL=$WORKDIR/tmp.sql
 echo "DELETE FROM geometry_columns WHERE f_table_name = 'gt' OR  f_table_name = 'pt_gt'; DROP TABLE IF EXISTS gt; CREATE TABLE gt AS" > $SQL
 
-for SHP in `ls $SCPDIR | grep shp$ | sed 's/\.shp//g'; do
+for SHP in `ls $SCPDIR | grep shp$ | sed 's/\.shp//g'`; do
     TBL=$(echo $SHP | sed 's/-.*//g' | tr A-Z a-z | sed 's/-//g')
     GID=$(echo $SHP | sed -e "s/\(L.\{24\}\).*/\1/g; s/-//g")
     PROJ="$(cat $SCPDIR/$SHP.prj)"
