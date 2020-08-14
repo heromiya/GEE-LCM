@@ -26,7 +26,7 @@ for SHP in `ls $SCPDIR | grep shp$ | sed 's/\.shp//g'`; do
     TBL=$(echo $SHP | sed 's/-.*//g' | tr A-Z a-z | sed 's/-//g')
     GID=$(echo $SHP | sed -e "s/\(L.\{24\}\).*/\1/g; s/-//g")
     PROJ="$(cat $SCPDIR/$SHP.prj)"
-    EPSG=$(python3 identifyEPSG.py "$PROJ")
+    EPSG=$(python identifyEPSG.py "$PROJ")
     spatialite -silent $OUTDB ".loadshp $SCPDIR/$SHP $TBL UTF-8 $EPSG geometry" 
     printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM $TBL UNION ALL " >> $SQL
 done
