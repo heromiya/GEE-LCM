@@ -12,7 +12,7 @@ gt_$(GID)_1.gpkg: gt_$(GID).tif #gt_$(GID).vrt gt_$(GID).csv
 	TMPLOCATION=`mktemp -d grass-XXXXX` && \
 	$(GRASS) -c EPSG:4326 $$TMPLOCATION/PERMANENT --exec $(GRASS_EXEC) `pwd`/$(GID)_1.sh && \
 	rm -rf $$TMPLOCATION
-#	$(GRASS) -c EPSG:4326 --tmp-location --exec `pwd`/$(GID)_1.sh
+
 gt_$(GID)_2.gpkg: gt_$(GID).tif
 	rm -f $@
 	N_MAX=`gdalinfo -hist $< | grep bucket -A 1 | tail -n 1 | sed 's/^ *//g' | cut -f 3 -d " "`; if [ $$N_MAX -lt $(NSAMPLE) ]; then N=$$N_MAX; else N=$(NSAMPLE); fi; printf "r.in.gdal input=gt_$(GID).tif output=gt_$(GID) --overwrite \ng.region raster=gt_$(GID) \nr.null map=gt_$(GID) setnull=1,3,4 \nr.random input=gt_$(GID) npoint=$$N vector=gt_$(GID)_2 --overwrite \nv.out.ogr input=gt_$(GID)_2 output=gt_$(GID)_2.gpkg format=GPKG --overwrite" > $(GID)_2.sh
@@ -20,7 +20,7 @@ gt_$(GID)_2.gpkg: gt_$(GID).tif
 	TMPLOCATION=`mktemp -d grass-XXXXX` && \
 	$(GRASS) -c EPSG:4326 $$TMPLOCATION/PERMANENT --exec $(GRASS_EXEC) `pwd`/$(GID)_2.sh && \
 	rm -rf $$TMPLOCATION
-#	$(GRASS) -c EPSG:4326 --tmp-location --exec `pwd`/$(GID)_2.sh
+
 gt_$(GID)_3.gpkg: gt_$(GID).tif
 	rm -f $@
 	N_MAX=`gdalinfo -hist $< | grep bucket -A 1 | tail -n 1 | sed 's/^ *//g' | cut -f 4 -d " "`; if [ $$N_MAX -lt $(NSAMPLE) ]; then N=$$N_MAX; else N=$(NSAMPLE); fi; printf "r.in.gdal input=gt_$(GID).tif output=gt_$(GID) --overwrite \ng.region raster=gt_$(GID) \nr.null map=gt_$(GID) setnull=1,2,4 \nr.random input=gt_$(GID) npoint=$$N vector=gt_$(GID)_3 --overwrite \nv.out.ogr input=gt_$(GID)_3 output=gt_$(GID)_3.gpkg format=GPKG --overwrite" > $(GID)_3.sh
@@ -36,9 +36,8 @@ gt_$(GID)_4.gpkg: gt_$(GID).tif
 	$(GRASS) -c EPSG:4326 $$TMPLOCATION/PERMANENT --exec $(GRASS_EXEC) `pwd`/$(GID)_4.sh && \
 	rm -rf $$TMPLOCATION
 
-#	$(GRASS) -c EPSG:4326 --tmp-location --exec `pwd`/$(GID)_4.sh
 
-#	ogr2ogr $@ $<
+###########################################
 gt_$(GID).tmp: gt_$(GID).tif
 	gdal_translate -of XYZ $< $@
 gt_$(GID).csv: gt_$(GID).tmp

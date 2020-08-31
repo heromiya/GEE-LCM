@@ -60,5 +60,15 @@ fi
 rm -f gt-pt.*
 for GPKG in pointize/*.gpkg ; do
     LAYER=$(ogrinfo $GPKG | grep Point | awk '{print $2}')
-    ogr2ogr -append -sql "SELECT geom, '`echo $LAYER | sed 's/gt_//g'`' as gid, cast(value as integer) as class, cast(`echo $LAYER | sed 's/gt_L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}_[0-9]/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;'` as integer) AS year from $LAYER" gt-pt.shp $GPKG $LAYER
+    GID=$(echo $LAYER | sed 's/gt_//g')
+    YEAR=$(echo $LAYER | sed 's/gt_L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}_[0-9]/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;')
+    if [ -z "$(echo $GID | grep L[CETM][0-9][0-9]_)" ]; then
+	DOY=$(echo $GID | sed 's/L[CETM][0-9]\{11\}\([0-9]\{3\}\).*/\1/g')
+	MONTH=$(date +%m -d "1 Jan $YEAR $(expr $DOY - 1) days")
+	DAY=$(date +%d -d "1 Jan $YEAR $(expr $DOY - 1) days")
+    else
+	MONTH=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g;')
+	DAY=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g;')
+    fi
+    ogr2ogr -append -sql "SELECT geom, '$GID' as gid, cast(value as integer) as class, cast($YEAR as integer) AS year, cast($MONTH as integer) AS month, cast($DAY as integer) AS day from $LAYER" gt-pt.shp $GPKG $LAYER
 done
