@@ -9,7 +9,7 @@ if [ "$OS" = 'Windows_NT' ]; then
     export PATH=$PATH:`pwd`
     export GRASS=/c/OSGeo4W64/bin/grass78.bat
 else
-    export GRASS=grass74
+    export GRASS=grass
     export GRASS_EXEC=sh
 fi
 
