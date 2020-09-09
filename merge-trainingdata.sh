@@ -1,6 +1,6 @@
 #! /bin/bash
 
-export NSAMPLE=1000 # Number of sample per class in a scene.
+export NSAMPLE=10000 # Number of sample per class in a scene.
 
 # For Windows with OSGeo4W64 and Git Bash. Requiring "gdal-full" in OSGeo4W.
 if [ "$OS" = 'Windows_NT' ]; then 
@@ -67,8 +67,9 @@ for GPKG in pointize/*.gpkg ; do
 	MONTH=$(date +%m -d "1 Jan $YEAR $(expr $DOY - 1) days")
 	DAY=$(date +%d -d "1 Jan $YEAR $(expr $DOY - 1) days")
     else
-	MONTH=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g;')
-	DAY=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g;')
+	MONTH=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}\([0-9]\{2\}\).*/\1/g;' | sed 's/^0//g')
+	DAY=$(echo $GID | sed 's/L[CETM][0-9]\{2\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g; s/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_[0-9]\{4\}[0-9]\{2\}\([0-9]\{2\}\).*/\1/g;' | sed 's/^0//g')
+	DOY=$(date --date="$(printf %04d-%02d-%02d $YEAR $MONTH $DAY)" +%j)
     fi
-    ogr2ogr -append -sql "SELECT geom, '$GID' as gid, cast(value as integer) as class, cast($YEAR as integer) AS year, cast($MONTH as integer) AS month, cast($DAY as integer) AS day from $LAYER" gt-pt.shp $GPKG $LAYER
+    ogr2ogr -append -sql "SELECT geom, '$GID' as gid, cast(value as integer) as class, cast($YEAR as integer) AS year, cast($MONTH as integer) AS month, cast($DAY as integer) AS day, cast($DOY as integer) AS doy from $LAYER" gt-pt.shp $GPKG $LAYER
 done

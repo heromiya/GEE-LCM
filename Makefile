@@ -28,6 +28,7 @@ gt_$(GID)_3.gpkg: gt_$(GID).tif
 	TMPLOCATION=`mktemp -d grass-XXXXX` && \
 	$(GRASS) -c EPSG:4326 $$TMPLOCATION/PERMANENT --exec $(GRASS_EXEC) `pwd`/$(GID)_3.sh && \
 	rm -rf $$TMPLOCATION
+
 gt_$(GID)_4.gpkg: gt_$(GID).tif
 	rm -f $@
 	N_MAX=`gdalinfo -hist $< | grep bucket -A 1 | tail -n 1 | sed 's/^ *//g' | cut -f 5 -d " "`; if [ $$N_MAX -lt $(NSAMPLE) ]; then N=$$N_MAX; else N=$(NSAMPLE); fi; printf "r.in.gdal input=gt_$(GID).tif output=gt_$(GID) --overwrite \ng.region raster=gt_$(GID) \nr.null map=gt_$(GID) setnull=1,2,3 \nr.random input=gt_$(GID) npoint=$$N vector=gt_$(GID)_4 --overwrite \nv.out.ogr input=gt_$(GID)_4 output=gt_$(GID)_4.gpkg format=GPKG --overwrite" > $(GID)_4.sh
