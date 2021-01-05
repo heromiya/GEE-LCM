@@ -72,5 +72,6 @@ for GPKG in pointize/*.gpkg ; do
 	DOY=$(date --date="$(printf %04d-%02d-%02d $YEAR $MONTH $DAY)" +%j)
     fi
     ogr2ogr -append -sql "SELECT geom, '$GID' as gid, cast(value as integer) as class, cast($YEAR as integer) AS year, cast($MONTH as integer) AS month, cast($DAY as integer) AS day, cast($DOY as integer) AS doy from $LAYER" gt-pt.shp $GPKG $LAYER
-     zip gt-pt.zip gt-pt.shp gt-pt.dbf gt-pt.shx gt-pt.prj
+
 done
+zip gt-pt.zip gt-pt.shp gt-pt.dbf gt-pt.shx gt-pt.prj
