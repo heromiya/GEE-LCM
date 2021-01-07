@@ -16,19 +16,19 @@ fi
 export WORKDIR=$(mktemp -d)
 export OUTDB=$WORKDIR/tmp.sqlite
 SCPDIR="SCP-shapefiles"
-#:<<'#EOF'
 
 rm -f $OUTDB
 SQL=$WORKDIR/tmp.sql
 echo "DELETE FROM geometry_columns WHERE f_table_name = 'gt' OR  f_table_name = 'pt_gt'; DROP TABLE IF EXISTS gt; CREATE TABLE gt AS" > $SQL
 
 for SHP in `ls $SCPDIR | grep shp$ | sed 's/\.shp//g'`; do
-    TBL=$(echo $SHP | sed 's/-.*//g' | tr A-Z a-z | sed 's/-//g')
-    GID=$(echo $SHP | sed -e "s/\(L.\{24\}\).*/\1/g; s/-//g")
+    TBL=$(echo $SHP | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
+    GID=$(echo $SHP | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
     PROJ="$(cat $SCPDIR/$SHP.prj)"
     EPSG=$(python identifyEPSG.py "$PROJ")
-    spatialite -silent $OUTDB ".loadshp $SCPDIR/$SHP $TBL UTF-8 $EPSG geometry" 
-    printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM $TBL UNION ALL " >> $SQL
+    ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$SHP.shp $SCPDIR/$SHP.shp
+    spatialite -silent $OUTDB ".loadshp $WORKDIR/$SHP $TBL UTF-8 $EPSG geometry"
+    printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM ${TBL} UNION ALL " >> $SQL
 done
 
 echo "; INSERT INTO geometry_columns VALUES ('gt','geometry',3,2,4326,0);" >> $SQL
@@ -55,13 +55,12 @@ else
     done
 fi
 
-#EOF
-
 rm -f gt-pt.*
 for GPKG in pointize/*.gpkg ; do
     LAYER=$(ogrinfo $GPKG | grep Point | awk '{print $2}')
     GID=$(echo $LAYER | sed 's/gt_//g')
-    YEAR=$(echo $LAYER | sed 's/gt_L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}_[0-9]/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;')
+    #YEAR=$(echo $LAYER | sed 's/gt_L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\)[0-9]\{4\}_[0-9]/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;')
+    YEAR=$(echo $LAYER | sed 's/gt_L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/gt_L[CET][0-9]._\([0-9]\{4\}\).*/\1/;')
     if [ -z "$(echo $GID | grep L[CETM][0-9][0-9]_)" ]; then
 	DOY=$(echo $GID | sed 's/L[CETM][0-9]\{11\}\([0-9]\{3\}\).*/\1/g')
 	MONTH=$(date +%m -d "1 Jan $YEAR $(expr $DOY - 1) days")
