@@ -1,6 +1,6 @@
 #! /bin/bash
 
-export NSAMPLE=10000 # Number of sample per class in a scene.
+export NSAMPLE=$1 # Number of sample per class in a scene.
 
 # For Windows with OSGeo4W64 and Git Bash. Requiring "gdal-full" in OSGeo4W.
 if [ "$OS" = 'Windows_NT' ]; then 
