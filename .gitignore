@@ -8,3 +8,4 @@ gt-pt.shx
 *.xml
 *.gpkg
 pointize/*
+.ipynb_checkpoints/LandCoverMapGen-checkpoint.ipynb
