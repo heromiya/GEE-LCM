@@ -22,12 +22,12 @@ SQL=$WORKDIR/tmp.sql
 echo "DELETE FROM geometry_columns WHERE f_table_name = 'gt' OR  f_table_name = 'pt_gt'; DROP TABLE IF EXISTS gt; CREATE TABLE gt AS" > $SQL
 
 for SHP in `find $SCPDIR -type f -regex ".*shp$" | sed 's/\.shp//g'`; do
-    TBL=$(echo $SHP | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
-    GID=$(echo $SHP | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
-    PROJ="$(cat $SCPDIR/$SHP.prj)"
+    TBL=$(echo $(basename $SHP) | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
+    GID=$(echo $(basename $SHP) | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
+    PROJ="$(cat $SHP.prj)"
     EPSG=$(python identifyEPSG.py "$PROJ")
-    ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$SHP.shp $SHP.shp
-    spatialite -silent $OUTDB ".loadshp $WORKDIR/$SHP $TBL UTF-8 $EPSG geometry"
+    ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$(basename $SHP.shp) $SHP.shp
+    spatialite -silent $OUTDB ".loadshp $WORKDIR/$(basename $SHP) $TBL UTF-8 $EPSG geometry"
     printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM ${TBL} UNION ALL " >> $SQL
 done
 
