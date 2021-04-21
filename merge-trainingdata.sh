@@ -1,9 +1,11 @@
 #! /bin/bash
 
-export NSAMPLE_1=$1 # Number of sample per class in a scene.
-export NSAMPLE_2=$2
-export NSAMPLE_3=$3
-export NSAMPLE_4=$4
+export YEAR_BEGIN=$1
+export YEAR_END=$2
+export NSAMPLE_1=$3 # Number of sample per class in a scene.
+export NSAMPLE_2=$4
+export NSAMPLE_3=$5
+export NSAMPLE_4=$6
 
 if [ -z "$NSAMPLE_4" ]; then
     echo "Number of samples for 4 classes are not provided. $NSAMPLE_1 is applied to all classes."
@@ -32,13 +34,16 @@ SQL=$WORKDIR/tmp.sql
 echo "DELETE FROM geometry_columns WHERE f_table_name = 'gt' OR  f_table_name = 'pt_gt'; DROP TABLE IF EXISTS gt; CREATE TABLE gt AS" > $SQL
 
 for SHP in `find $SCPDIR -type f -regex ".*shp$" | sed 's/\.shp//g'`; do
-    TBL=$(echo $(basename $SHP) | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
-    GID=$(echo $(basename $SHP) | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
-    PROJ="$(cat $SHP.prj)"
-    EPSG=$(python identifyEPSG.py "$PROJ")
-    ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$(basename $SHP.shp) $SHP.shp
-    spatialite -silent $OUTDB ".loadshp $WORKDIR/$(basename $SHP) $TBL UTF-8 $EPSG geometry"
-    printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM ${TBL} UNION ALL " >> $SQL
+    YEAR=$(echo $SHP | sed "s/$SCPDIR\/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\).*/\1/; s/$SCPDIR\/L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/$SCPDIR\/L[CET][0-9]._\([0-9]\{4\}\).*/\1/;")
+    if [ $YEAR -ge $YEAR_BEGIN -a $YEAR -le $YEAR_END ]; then
+        TBL=$(echo $(basename $SHP) | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
+        GID=$(echo $(basename $SHP) | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
+        PROJ="$(cat $SHP.prj)"
+        EPSG=$(python identifyEPSG.py "$PROJ")
+        ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$(basename $SHP.shp) $SHP.shp
+        spatialite -silent $OUTDB ".loadshp $WORKDIR/$(basename $SHP) $TBL UTF-8 $EPSG geometry"
+        printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM ${TBL} UNION ALL " >> $SQL
+    fi
 done
 
 echo "; INSERT INTO geometry_columns VALUES ('gt','geometry',3,2,4326,0);" >> $SQL
