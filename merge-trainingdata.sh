@@ -1,6 +1,16 @@
 #! /bin/bash
 
-export NSAMPLE=$1 # Number of sample per class in a scene.
+export NSAMPLE_1=$1 # Number of sample per class in a scene.
+export NSAMPLE_2=$2
+export NSAMPLE_3=$3
+export NSAMPLE_4=$4
+
+if [ -z "$NSAMPLE_4" ]; then
+    echo "Number of samples for 4 classes are not provided. $NSAMPLE_1 is applied to all classes."
+    export NSAMPLE_2=$NSAMPLE_1
+    export NSAMPLE_3=$NSAMPLE_1
+    export NSAMPLE_4=$NSAMPLE_1
+fi
 
 # For Windows with OSGeo4W64 and Git Bash. Requiring "gdal-full" in OSGeo4W.
 if [ "$OS" = 'Windows_NT' ]; then 
