@@ -1,11 +1,28 @@
 #! /bin/bash
 
+
+while getopts b:e:r:1:2:3:4: OPT
+do
+    case $OPT in
+        b) export YEAR_BEGIN=$OPTARG;;
+        e) export YEAR_END=$OPTARG;;
+        r) export RES=$OPTARG;;
+        1) export NSAMPLE_1=$OPTARG;;
+        2) export NSAMPLE_2=$OPTARG;;
+        3) export NSAMPLE_3=$OPTARG;;
+        4) export NSAMPLE_4=$OPTARG;;
+    esac
+done
+
+:<<"#EOF"
 export YEAR_BEGIN=$1
 export YEAR_END=$2
-export NSAMPLE_1=$3 # Number of sample per class in a scene.
-export NSAMPLE_2=$4
-export NSAMPLE_3=$5
-export NSAMPLE_4=$6
+export RES=$3
+export NSAMPLE_1=$4 # Number of sample per class in a scene.
+export NSAMPLE_2=$5
+export NSAMPLE_3=$6
+export NSAMPLE_4=$7
+#EOF
 
 if [ -z "$NSAMPLE_4" ]; then
     echo "Number of samples for 4 classes are not provided. $NSAMPLE_1 is applied to all classes."
