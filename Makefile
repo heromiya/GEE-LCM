@@ -4,7 +4,7 @@ gt_$(GID).tif:
 	YMIN=`echo $$EXTENT | cut -d '|' -f 2`  && \
 	XMAX=`echo $$EXTENT | cut -d '|' -f 3`  && \
 	YMAX=`echo $$EXTENT | cut -d '|' -f 4`  && \
-	gdal_rasterize -te $$XMIN $$YMIN $$XMAX $$YMAX -a mc_id -l gt -where "GID='$(GID)'" -of GTiff -co COMPRESS=Deflate -a_nodata 255 -tr 0.00025 0.00025 -ot Byte $(OUTDB) $@
+	gdal_rasterize -te $$XMIN $$YMIN $$XMAX $$YMAX -a mc_id -l gt -where "GID='$(GID)'" -of GTiff -co COMPRESS=Deflate -a_nodata 255 -tr $(RES) $(RES) -ot Byte $(OUTDB) $@
 gt_$(GID)_1.gpkg: gt_$(GID).tif #gt_$(GID).vrt gt_$(GID).csv
 	rm -f $@
 	N_MAX=`gdalinfo -hist $< | grep bucket -A 1 | tail -n 1 | sed 's/^ *//g' | cut -f 2 -d " "`; if [ $$N_MAX -lt $(NSAMPLE_1) ]; then N=$$N_MAX; else N=$(NSAMPLE_1); fi; printf "r.in.gdal input=gt_$(GID).tif output=gt_$(GID) --overwrite \ng.region raster=gt_$(GID) \nr.null map=gt_$(GID) setnull=2,3,4 \nr.random input=gt_$(GID) npoint=$$N vector=gt_$(GID)_1 --overwrite \nv.out.ogr input=gt_$(GID)_1 output=gt_$(GID)_1.gpkg format=GPKG --overwrite" > $(GID)_1.sh
