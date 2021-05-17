@@ -1,52 +1,27 @@
 #! /bin/bash
 
-args=`getopt -o b:e:r:1:2:3:4: -l pmin,pmax,rmin,rmax -- "$@"`
+OPT=`getopt -o b:e:r:1:2:3:4: -l pmin:,pmax:,rmin:,rmax: -- "$@"`
 eval set -- "$OPT"
 
 while true
 do
     case $1 in
-        -b) export YEAR_BEGIN=$2
-            shift 2
-            ;;
-        -e) export YEAR_END=$2
-            shift 2
-            ;;
-        -r) export RES=$2
-            shift 2
-            ;;
-        -1) export NSAMPLE_1=$2
-            shift 2
-            ;;
-        -2) export NSAMPLE_2=$2
-            shift 2
-            ;;
-        -3) export NSAMPLE_3=$2
-            shift 2
-            ;;
-        -4) export NSAMPLE_4=$2
-            shift 2
-            ;;
-        --pmax) 
-            export PMAX=$2
-            shift 2
-            ;;        
-        --pmin)
-            export PMIN=$2
-            shift 2
-            ;;        
-        --rmax)
-            export RMAX=$2
-            shift 2
-            ;;        
-        --rmin)
-            export RMIN=$2
-            shift 2
-            ;;
+        -b) export YEAR_BEGIN=$2;;
+        -e) export YEAR_END=$2;;
+        -r) export RES=$2;;
+        -1) export NSAMPLE_1=$2;;
+        -2) export NSAMPLE_2=$2;;
+        -3) export NSAMPLE_3=$2;;
+        -4) export NSAMPLE_4=$2;;
+        --pmax) export PMAX=$2;;        
+        --pmin) export PMIN=$2;;        
+        --rmax) export RMAX=$2;;        
+        --rmin) export RMIN=$2;;
         --) shift
             break
             ;;
     esac
+    shift 2
 done
 
 :<<"#EOF"
