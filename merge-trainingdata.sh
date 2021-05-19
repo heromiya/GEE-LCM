@@ -1,17 +1,27 @@
 #! /bin/bash
 
+OPT=`getopt -o b:e:r:1:2:3:4: -l pmin:,pmax:,rmin:,rmax: -- "$@"`
+eval set -- "$OPT"
 
-while getopts b:e:r:1:2:3:4: OPT
+while true
 do
-    case $OPT in
-        b) export YEAR_BEGIN=$OPTARG;;
-        e) export YEAR_END=$OPTARG;;
-        r) export RES=$OPTARG;;
-        1) export NSAMPLE_1=$OPTARG;;
-        2) export NSAMPLE_2=$OPTARG;;
-        3) export NSAMPLE_3=$OPTARG;;
-        4) export NSAMPLE_4=$OPTARG;;
+    case $1 in
+        -b) export YEAR_BEGIN=$2;;
+        -e) export YEAR_END=$2;;
+        -r) export RES=$2;;
+        -1) export NSAMPLE_1=$2;;
+        -2) export NSAMPLE_2=$2;;
+        -3) export NSAMPLE_3=$2;;
+        -4) export NSAMPLE_4=$2;;
+        --pmax) export PMAX=$2;;        
+        --pmin) export PMIN=$2;;        
+        --rmax) export RMAX=$2;;        
+        --rmin) export RMIN=$2;;
+        --) shift
+            break
+            ;;
     esac
+    shift 2
 done
 
 :<<"#EOF"
@@ -52,7 +62,9 @@ echo "DELETE FROM geometry_columns WHERE f_table_name = 'gt' OR  f_table_name = 
 
 for SHP in `find $SCPDIR -type f -regex ".*shp$" | sed 's/\.shp//g'`; do
     YEAR=$(echo $SHP | sed "s/$SCPDIR\/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_[0-9]\{6\}_\([0-9]\{4\}\).*/\1/; s/$SCPDIR\/L[CET][0-9]\{7\}\([0-9]\{4\}\).*/\1/; s/$SCPDIR\/L[CET][0-9]._\([0-9]\{4\}\).*/\1/;")
-    if [ $YEAR -ge $YEAR_BEGIN -a $YEAR -le $YEAR_END ]; then
+    P=$(echo $SHP | sed "s/$SCPDIR\/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_\([0-9]\{3\}\)\([0-9]\{3\}\)_\([0-9]\{4\}\).*/\1/g; s/$SCPDIR\/L[CET][0-9]\([0-9]\{3\}\)\([0-9]\{3\}\)\([0-9]\{4\}\).*/\1/;")
+    R=$(echo $SHP | sed "s/$SCPDIR\/L[CETM][0-9]\{2\}_[A-Z0-9]\{4\}_\([0-9]\{3\}\)\([0-9]\{3\}\)_\([0-9]\{4\}\).*/\2/g; s/$SCPDIR\/L[CET][0-9]\([0-9]\{3\}\)\([0-9]\{3\}\)\([0-9]\{4\}\).*/\2/;")
+    if [ $YEAR -ge $YEAR_BEGIN -a $YEAR -le $YEAR_END -a $P -ge $PMIN -a $P -le $PMAX -a $R -ge $RMIN -a $R -le $RMAX ]; then
         TBL=$(echo $(basename $SHP) | tr A-Z a-z | sed 's/-/_/g') # | sed 's/-.*//g'
         GID=$(echo $(basename $SHP) | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
         PROJ="$(cat $SHP.prj)"
