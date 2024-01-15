@@ -69,8 +69,8 @@ for SHP in `find $SCPDIR -type f -regex ".*shp$" | sed 's/\.shp//g'`; do
         GID=$(echo $(basename $SHP) | sed -e "s/-/_/g") # s/\(L.\{24\}\).*/\1/g; 
         PROJ="$(cat $SHP.prj)"
         EPSG=$(python identifyEPSG.py "$PROJ")
-        ogr2ogr -select MC_ID,C_ID,SCP_UID $WORKDIR/$(basename $SHP.shp) $SHP.shp
-        spatialite -silent $OUTDB ".loadshp $WORKDIR/$(basename $SHP) $TBL UTF-8 $EPSG geometry"
+	ogr2ogr -append -f SQLite -dsco SPATIALITE=YES -nlt PROMOTE_TO_MULTI $OUTDB $SHP.shp # -select MC_ID,C_ID,SCP_UID  $WORKDIR/$(basename $SHP.shp) $SHP.shp
+        #spatialite -silent $OUTDB ".loadshp $WORKDIR/$(basename $SHP) $TBL UTF-8 $EPSG geometry"
         printf "SELECT ST_Transform(GEOMETRY,4326) as geometry,MC_ID as mc_id,'$GID' AS GID FROM ${TBL} UNION ALL " >> $SQL
     fi
 done
